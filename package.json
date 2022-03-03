@@ -1,0 +1,23 @@
+{
+	"name": "iubus",
+	"version": "0.0.1",
+	"description": "Dead simple discord.js slash command framework",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"author": {
+		"name": "BaumianerNiklas",
+		"url": "https://github.com/BaumianerNiklas"
+	},
+	"repository": {
+		"url": "https://github.com/BaumianerNiklas/iubus"
+	},
+	"license": "MIT",
+	"devDependencies": {
+		"typescript": "^4.5.5"
+	},
+	"dependencies": {
+		"@discordjs/rest": "^0.4.0-dev.1645661242.8203c5d",
+		"discord.js": "^14.0.0-dev.1645617805.5158332"
+	}
+}

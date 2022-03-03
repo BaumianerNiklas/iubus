@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"strict": true,
+		"target": "esnext",
+		"module": "esnext",
+		"outDir": "dist",
+		"moduleResolution": "node",
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"baseUrl": ".",
+		"experimentalDecorators": true,
+		"declaration": true
+	},
+	"include": ["lib/**/*"],
+	"exclude": ["node_modules"]
+}
