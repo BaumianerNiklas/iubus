@@ -56,17 +56,23 @@ export class Iubus implements IubusData {
 
 	private async setupInteractionListener(client: Client) {
 		client.on("interactionCreate", async (interaction) => {
-			if (!interaction.isCommand()) return;
+			if (!interaction.isAutocomplete() && !interaction.isCommand()) return;
 
 			const { commandName } = interaction;
 			const command = this.commands.get(commandName);
 			if (!command) return;
 
-			if (interaction.isChatInputCommand() && command.type === ApplicationCommandType.ChatInput) {
-				const subcmd = interaction.options.getSubcommand();
-				const subgroup = interaction.options.getSubcommandGroup();
+			// Autocomplete
+			if (interaction.isAutocomplete()) {
+				if (command.autocomplete) command.autocomplete(interaction);
+			}
 
-				if (subgroup && command.subcommands) {
+			// Regular slash commands
+			if (interaction.isChatInputCommand() && command.type === ApplicationCommandType.ChatInput) {
+				const subcmd = interaction.options.getSubcommand(false);
+				const subgroup = interaction.options.getSubcommandGroup(false);
+
+				if (subcmd && subgroup && command.subcommands) {
 					const group = command.subcommands[subgroup];
 					if (typeof group !== "object") {
 						throw new Error(
@@ -90,6 +96,8 @@ export class Iubus implements IubusData {
 				}
 
 				if (command.run) await command.run(interaction);
+
+				// Context menu commands
 			} else if (interaction.isUserContextMenuCommand() && command.type === ApplicationCommandType.User) {
 				if (command.run) await command.run(interaction);
 			} else if (interaction.isMessageContextMenuCommand() && command.type === ApplicationCommandType.Message) {

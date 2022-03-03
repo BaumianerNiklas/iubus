@@ -12,7 +12,14 @@ export async function deployCommands(options: DeployOptions) {
 		: GUILD_DEPLOY_URL(options.applicationId, options.guildId!);
 
 	rest.put(route, {
-		body: commands,
+		body: commands.map((c) => {
+			return {
+				name: c.name,
+				type: c.type,
+				description: c.description,
+				options: c.options,
+			};
+		}),
 	});
 }
 

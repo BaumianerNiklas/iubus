@@ -1,6 +1,7 @@
 import {
 	ApplicationCommandOptionData,
 	ApplicationCommandType,
+	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	CommandInteraction,
 } from "discord.js";
@@ -13,6 +14,7 @@ export class Command implements CommandData {
 	public readonly subcommands?: Subcommands;
 
 	public run?: (interaction: CommandInteraction) => unknown;
+	public autocomplete?: (interaction: AutocompleteInteraction) => unknown;
 
 	constructor(data: ChatInputCommandData | ContextMenuCommandData) {
 		this.type = data.type ?? ApplicationCommandType.ChatInput;
@@ -22,6 +24,7 @@ export class Command implements CommandData {
 		this.run = data.run;
 
 		if (data.subcommands) this.subcommands = data.subcommands;
+		if (data.autocomplete) this.autocomplete = data.autocomplete;
 	}
 }
 
@@ -30,9 +33,9 @@ export interface CommandData {
 	name: string;
 	description: string;
 	options?: ApplicationCommandOptionData[];
-
-	run?: (interaction: CommandInteraction) => unknown;
 	subcommands?: Subcommands;
+	run?: (interaction: CommandInteraction) => unknown;
+	autocomplete?: (interaction: AutocompleteInteraction) => unknown;
 }
 
 export interface ChatInputCommandData extends CommandData {
