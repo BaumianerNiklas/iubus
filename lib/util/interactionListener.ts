@@ -1,5 +1,5 @@
 import { ApplicationCommandType, Collection, Interaction } from "discord.js";
-import { Command, SubcommandGroup, SubcommandMethod } from "lib/structures/Command.js";
+import type { Command, SubcommandGroup, SubcommandMethod } from "../structures/Command.js";
 
 export async function interactionListener(
 	interaction: Interaction,
