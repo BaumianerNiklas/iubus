@@ -3,24 +3,25 @@ import {
 	ApplicationCommandType,
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
-	CommandInteraction,
+	MessageContextMenuCommandInteraction,
+	UserContextMenuCommandInteraction,
 } from "discord.js";
 
-export class Command implements CommandData {
-	public readonly type: ApplicationCommandType;
+export class Command<T extends ApplicationCommandType> implements CommandData<T> {
+	public readonly type: T;
 	public readonly name: string;
 	public readonly description: string;
-	public readonly options: ApplicationCommandOptionData[];
-	public readonly subcommands?: Subcommands;
+	public readonly options?: ChatInputOnly<T, ApplicationCommandOptionData[]>;
+	public readonly subcommands?: ChatInputOnly<T, Subcommands>;
 
-	public run?: (interaction: CommandInteraction) => unknown;
-	public autocomplete?: (interaction: AutocompleteInteraction) => unknown;
+	public run?: RunMethod<T>;
+	public autocomplete?: ChatInputOnly<T, (interaction: AutocompleteInteraction) => unknown>;
 
-	constructor(data: ChatInputCommandData | ContextMenuCommandData) {
-		this.type = data.type ?? ApplicationCommandType.ChatInput;
+	constructor(data: CommandData<T>) {
+		this.type = data.type;
 		this.name = data.name;
 		this.description = this.type === ApplicationCommandType.ChatInput ? data.description : "";
-		this.options = data.options ?? [];
+		this.options = data.options;
 		this.run = data.run;
 
 		if (data.subcommands) this.subcommands = data.subcommands;
@@ -28,26 +29,26 @@ export class Command implements CommandData {
 	}
 }
 
-export interface CommandData {
-	type?: ApplicationCommandType;
+type RunMethod<T extends ApplicationCommandType> = T extends ApplicationCommandType.ChatInput
+	? (interaction: ChatInputCommandInteraction) => unknown
+	: T extends ApplicationCommandType.User
+	? (interaction: UserContextMenuCommandInteraction) => unknown
+	: T extends ApplicationCommandType.Message
+	? (interaction: MessageContextMenuCommandInteraction) => unknown
+	: never;
+
+type ChatInputOnly<CommandType extends ApplicationCommandType, T> = CommandType extends ApplicationCommandType.ChatInput
+	? T | undefined
+	: never;
+
+export interface CommandData<T extends ApplicationCommandType = ApplicationCommandType.ChatInput> {
+	type: T;
 	name: string;
 	description: string;
-	options?: ApplicationCommandOptionData[];
-	subcommands?: Subcommands;
-	run?: (interaction: CommandInteraction) => unknown;
-	autocomplete?: (interaction: AutocompleteInteraction) => unknown;
-}
-
-export interface ChatInputCommandData extends CommandData {
-	type?: ApplicationCommandType.ChatInput;
-	subcommands?: Subcommands;
-}
-
-export interface ContextMenuCommandData extends CommandData {
-	type: ApplicationCommandType.Message | ApplicationCommandType.User;
-	options: never;
-	subcommands: never;
-	autocomplete: never;
+	options?: ChatInputOnly<T, ApplicationCommandOptionData[]>;
+	subcommands?: ChatInputOnly<T, Subcommands>;
+	run?: RunMethod<T>;
+	autocomplete?: ChatInputOnly<T, (interaction: AutocompleteInteraction) => unknown>;
 }
 
 export type Subcommands = SingleSubcommands | GroupedSubcommands;

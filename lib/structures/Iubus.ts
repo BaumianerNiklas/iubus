@@ -11,7 +11,7 @@ export class Iubus implements IubusData {
 	/** The directory containing your command files. This has to be relative to where you start your node process. */
 	public readonly commandDir?: string;
 	public readonly eventDir?: string;
-	public readonly commands: Collection<string, Command>;
+	public readonly commands: Collection<string, Command<ApplicationCommandType>>;
 	#initialized = false;
 
 	constructor(data: IubusData) {
@@ -24,7 +24,10 @@ export class Iubus implements IubusData {
 		if (this.#initialized) throw new Error("Cannot initialize twice.");
 
 		if (this.commandDir) {
-			const commands = (await resolveModules(this.commandDir, (mod) => mod instanceof Command)) as Command[];
+			const commands = (await resolveModules(
+				this.commandDir,
+				(mod) => mod instanceof Command
+			)) as Command<ApplicationCommandType>[];
 			for (const cmd of commands) {
 				this.commands.set(cmd.name, cmd);
 			}
@@ -69,15 +72,16 @@ export class Iubus implements IubusData {
 
 			// Regular slash commands
 			if (interaction.isChatInputCommand() && command.type === ApplicationCommandType.ChatInput) {
+				const cmd = command as Command<ApplicationCommandType.ChatInput>; // This type cast is safe but TS doesn't want to infer the generic
 				const subcmd = interaction.options.getSubcommand(false);
 				const subgroup = interaction.options.getSubcommandGroup(false);
 
-				if (subcmd && subgroup && command.subcommands) {
-					const group = command.subcommands[subgroup];
+				if (subcmd && subgroup && cmd.subcommands) {
+					const group = cmd.subcommands[subgroup];
 					if (typeof group !== "object") {
 						throw new Error(
 							`Expected subcommand ${subgroup} on command ${
-								command.name
+								cmd.name
 							} to be of type object as it is a group. Instead found type ${typeof group}.`
 						);
 					}
@@ -88,20 +92,22 @@ export class Iubus implements IubusData {
 					if (typeof method !== "function") {
 						throw new Error(
 							`Expected subcommand ${subcmd} on command ${
-								command.name
+								cmd.name
 							} to be of type function as it is not part of a group. Instead found type ${typeof method}.`
 						);
 					}
 					if (method) await method(interaction);
 				}
 
-				if (command.run) await command.run(interaction);
+				if (cmd.run) await cmd.run(interaction);
 
 				// Context menu commands
 			} else if (interaction.isUserContextMenuCommand() && command.type === ApplicationCommandType.User) {
-				if (command.run) await command.run(interaction);
+				const cmd = command as Command<ApplicationCommandType.User>;
+				if (cmd.run) await cmd.run(interaction);
 			} else if (interaction.isMessageContextMenuCommand() && command.type === ApplicationCommandType.Message) {
-				if (command.run) await command.run(interaction);
+				const cmd = command as Command<ApplicationCommandType.Message>;
+				if (cmd.run) await cmd.run(interaction);
 			}
 		});
 	}

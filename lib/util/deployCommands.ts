@@ -2,9 +2,13 @@ import { Command } from "../structures/Command.js";
 import { resolveModules } from "./resolveModules.js";
 import { REST } from "@discordjs/rest";
 import { GLOBAL_DEPLOY_URL, GUILD_DEPLOY_URL } from "./constants.js";
+import { ApplicationCommandType } from "discord.js";
 
 export async function deployCommands(options: DeployOptions) {
-	const commands = (await resolveModules(options.commandDir, (mod) => mod instanceof Command)) as Command[];
+	const commands = (await resolveModules(
+		options.commandDir,
+		(mod) => mod instanceof Command
+	)) as Command<ApplicationCommandType>[];
 	const rest = new REST({ version: "9" }).setToken(options.token);
 
 	const route = options.deployGlobally
