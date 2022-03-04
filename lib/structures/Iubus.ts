@@ -1,6 +1,7 @@
 import { ApplicationCommandType, Client, ClientEvents, Collection } from "discord.js";
 import { resolveModules } from "../util/resolveModules.js";
-import { Command, SubcommandGroup, SubcommandMethod } from "./Command.js";
+import { interactionListener } from "../util/interactionListener.js";
+import { Command } from "./Command.js";
 import { Event } from "./Event.js";
 import { container } from "./Container.js";
 
@@ -31,6 +32,10 @@ export class Iubus implements IubusData {
 			for (const cmd of commands) {
 				this.commands.set(cmd.name, cmd);
 			}
+
+			client.on("interactionCreate", async (interaction) => {
+				await interactionListener(interaction, this.commands);
+			});
 		}
 
 		if (this.eventDir) {
@@ -50,55 +55,9 @@ export class Iubus implements IubusData {
 			}
 		}
 
-		this.setupInteractionListener(client);
-		this.#initialized = true;
-
 		container.client = client;
 		container.iubus = this;
-	}
-
-	private async setupInteractionListener(client: Client) {
-		client.on("interactionCreate", async (interaction) => {
-			if (!interaction.isAutocomplete() && !interaction.isCommand()) return;
-
-			const { commandName } = interaction;
-			const command = this.commands.get(commandName);
-			if (!command) return;
-
-			// Autocomplete
-			if (interaction.isAutocomplete()) {
-				if (command.autocomplete) command.autocomplete(interaction);
-			}
-
-			// Regular slash commands
-			if (interaction.isChatInputCommand() && command.type === ApplicationCommandType.ChatInput) {
-				const cmd = command as Command<ApplicationCommandType.ChatInput>; // This type cast is safe but TS doesn't want to infer the generic
-
-				// Subcommand handling
-				const subcmd = interaction.options.getSubcommand(false);
-				const subgroup = interaction.options.getSubcommandGroup(false);
-
-				if (cmd.subcommands && (subcmd || subgroup)) {
-					if (subgroup && subcmd && typeof cmd.subcommands[subgroup] === "object") {
-						const group = cmd.subcommands[subgroup] as SubcommandGroup; // Again, this type cast *should* be safe
-						if (typeof group[subcmd] === "function") await group[subcmd](interaction);
-					} else if (!subgroup && subcmd && typeof cmd.subcommands[subcmd] === "function") {
-						const method = cmd.subcommands[subcmd] as SubcommandMethod;
-						await method(interaction);
-					}
-				}
-
-				if (cmd.run) await cmd.run(interaction);
-
-				// Context menu commands
-			} else if (interaction.isUserContextMenuCommand() && command.type === ApplicationCommandType.User) {
-				const cmd = command as Command<ApplicationCommandType.User>;
-				if (cmd.run) await cmd.run(interaction);
-			} else if (interaction.isMessageContextMenuCommand() && command.type === ApplicationCommandType.Message) {
-				const cmd = command as Command<ApplicationCommandType.Message>;
-				if (cmd.run) await cmd.run(interaction);
-			}
-		});
+		this.#initialized = true;
 	}
 }
 
