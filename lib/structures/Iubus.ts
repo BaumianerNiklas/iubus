@@ -4,6 +4,7 @@ import { interactionListener } from "../util/interactionListener.js";
 import { Command } from "./Command.js";
 import { Event } from "./Event.js";
 import { container } from "./Container.js";
+import { Inhibitor } from "./Inhibitor.js";
 
 /**
  * Singleton class for Iubus. This class sets up and controls all the logic needed for the framework to function after calling init().
@@ -12,13 +13,17 @@ export class Iubus implements IubusData {
 	/** The directory containing your command files. This has to be relative to where you start your node process. */
 	public readonly commandDir?: string;
 	public readonly eventDir?: string;
+	public readonly inhibitorDir?: string;
 	public readonly commands: Collection<string, Command<ApplicationCommandType>>;
+	public readonly inhibitors: Collection<string, Inhibitor>;
 	#initialized = false;
 
 	constructor(data: IubusData) {
 		this.commandDir = data.commandDir;
 		this.eventDir = data.eventDir;
+		this.inhibitorDir = data.inhibitorDir;
 		this.commands = new Collection();
+		this.inhibitors = new Collection();
 	}
 
 	public async init(client: Client) {
@@ -34,7 +39,7 @@ export class Iubus implements IubusData {
 			}
 
 			client.on("interactionCreate", async (interaction) => {
-				await interactionListener(interaction, this.commands);
+				await interactionListener(interaction, this.commands, this.inhibitors);
 			});
 		}
 
@@ -55,6 +60,17 @@ export class Iubus implements IubusData {
 			}
 		}
 
+		if (this.inhibitorDir) {
+			const inhibitors = (await resolveModules(
+				this.inhibitorDir,
+				(mod) => mod instanceof Inhibitor
+			)) as Inhibitor[];
+
+			for (const inhibitor of inhibitors) {
+				this.inhibitors.set(inhibitor.name, inhibitor);
+			}
+		}
+
 		container.client = client;
 		container.iubus = this;
 		this.#initialized = true;
@@ -64,4 +80,5 @@ export class Iubus implements IubusData {
 export interface IubusData {
 	commandDir?: string;
 	eventDir?: string;
+	inhibitorDir?: string;
 }

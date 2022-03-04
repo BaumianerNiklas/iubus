@@ -6,6 +6,7 @@ import {
 	MessageContextMenuCommandInteraction,
 	UserContextMenuCommandInteraction,
 } from "discord.js";
+import type { Inhibitor } from "./Inhibitor.js";
 
 export class Command<T extends ApplicationCommandType> implements CommandData<T> {
 	public readonly type: T;
@@ -13,6 +14,7 @@ export class Command<T extends ApplicationCommandType> implements CommandData<T>
 	public readonly description: string;
 	public readonly options?: ChatInputOnly<T, ApplicationCommandOptionData[]>;
 	public readonly subcommands?: ChatInputOnly<T, Subcommands>;
+	public readonly inhibitors?: Array<string | Inhibitor>;
 
 	public run?: RunMethod<T>;
 	public autocomplete?: ChatInputOnly<T, (interaction: AutocompleteInteraction) => unknown>;
@@ -25,6 +27,7 @@ export class Command<T extends ApplicationCommandType> implements CommandData<T>
 		this.run = data.run;
 
 		if (data.subcommands) this.subcommands = data.subcommands;
+		if (data.inhibitors) this.inhibitors = data.inhibitors;
 		if (data.autocomplete) this.autocomplete = data.autocomplete;
 	}
 }
@@ -47,6 +50,7 @@ export interface CommandData<T extends ApplicationCommandType = ApplicationComma
 	description: string;
 	options?: ChatInputOnly<T, ApplicationCommandOptionData[]>;
 	subcommands?: ChatInputOnly<T, Subcommands>;
+	inhibitors?: Array<string | Inhibitor>;
 	run?: RunMethod<T>;
 	autocomplete?: ChatInputOnly<T, (interaction: AutocompleteInteraction) => unknown>;
 }

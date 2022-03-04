@@ -1,15 +1,32 @@
 import { ApplicationCommandType, Collection, Interaction } from "discord.js";
+import { Inhibitor } from "../structures/Inhibitor.js";
 import type { Command, SubcommandGroup, SubcommandMethod } from "../structures/Command.js";
 
 export async function interactionListener(
 	interaction: Interaction,
-	commands: Collection<string, Command<ApplicationCommandType>>
+	commands: Collection<string, Command<ApplicationCommandType>>,
+	inhibitors: Collection<string, Inhibitor>
 ) {
 	if (!interaction.isAutocomplete() && !interaction.isCommand()) return;
 
 	const { commandName } = interaction;
 	const command = commands.get(commandName);
 	if (!command) return;
+
+	// Inhibitor checks
+	if (command.inhibitors && interaction.isCommand()) {
+		for (const selectedInhibitor of command.inhibitors) {
+			let inhibitor: Inhibitor | undefined;
+			if (typeof selectedInhibitor === "string") {
+				inhibitor = inhibitors.get(selectedInhibitor);
+			} else if (selectedInhibitor instanceof Inhibitor) {
+				inhibitor = selectedInhibitor;
+			}
+			if (!inhibitor) continue;
+			// Abort processing the interaction if an inhibitor inhibits the interaction
+			if (!inhibitor.run(interaction)) return;
+		}
+	}
 
 	// Autocomplete
 	if (interaction.isAutocomplete()) {
