@@ -1,6 +1,6 @@
 import { ApplicationCommandType, Client, ClientEvents, Collection } from "discord.js";
 import { resolveModules } from "../util/resolveModules.js";
-import { Command } from "./Command.js";
+import { Command, SubcommandGroup, SubcommandMethod } from "./Command.js";
 import { Event } from "./Event.js";
 import { container } from "./Container.js";
 
@@ -73,30 +73,19 @@ export class Iubus implements IubusData {
 			// Regular slash commands
 			if (interaction.isChatInputCommand() && command.type === ApplicationCommandType.ChatInput) {
 				const cmd = command as Command<ApplicationCommandType.ChatInput>; // This type cast is safe but TS doesn't want to infer the generic
+
+				// Subcommand handling
 				const subcmd = interaction.options.getSubcommand(false);
 				const subgroup = interaction.options.getSubcommandGroup(false);
 
-				if (subcmd && subgroup && cmd.subcommands) {
-					const group = cmd.subcommands[subgroup];
-					if (typeof group !== "object") {
-						throw new Error(
-							`Expected subcommand ${subgroup} on command ${
-								cmd.name
-							} to be of type object as it is a group. Instead found type ${typeof group}.`
-						);
+				if (cmd.subcommands && (subcmd || subgroup)) {
+					if (subgroup && subcmd && typeof cmd.subcommands[subgroup] === "object") {
+						const group = cmd.subcommands[subgroup] as SubcommandGroup; // Again, this type cast *should* be safe
+						if (typeof group[subcmd] === "function") await group[subcmd](interaction);
+					} else if (!subgroup && subcmd && typeof cmd.subcommands[subcmd] === "function") {
+						const method = cmd.subcommands[subcmd] as SubcommandMethod;
+						await method(interaction);
 					}
-					const method = group[subcmd];
-					if (method) await method(interaction);
-				} else if (subcmd) {
-					const method = command.subcommands?.[subcmd];
-					if (typeof method !== "function") {
-						throw new Error(
-							`Expected subcommand ${subcmd} on command ${
-								cmd.name
-							} to be of type function as it is not part of a group. Instead found type ${typeof method}.`
-						);
-					}
-					if (method) await method(interaction);
 				}
 
 				if (cmd.run) await cmd.run(interaction);

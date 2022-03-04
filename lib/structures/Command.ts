@@ -51,9 +51,7 @@ export interface CommandData<T extends ApplicationCommandType = ApplicationComma
 	autocomplete?: ChatInputOnly<T, (interaction: AutocompleteInteraction) => unknown>;
 }
 
-export type Subcommands = SingleSubcommands | GroupedSubcommands;
-export type SingleSubcommands = Record<string, SubcommandMethod>;
-export type GroupedSubcommands = Record<string, SubcommandGroup>;
+export type Subcommands = Record<string, SubcommandMethod | SubcommandGroup>;
 
 export type SubcommandMethod = (interaction: ChatInputCommandInteraction) => unknown;
 export type SubcommandGroup = Record<string, SubcommandMethod>;
