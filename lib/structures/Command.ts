@@ -32,7 +32,7 @@ export class Command<T extends ApplicationCommandType> implements CommandData<T>
 	}
 }
 
-type RunMethod<T extends ApplicationCommandType> = T extends ApplicationCommandType.ChatInput
+export type RunMethod<T extends ApplicationCommandType> = T extends ApplicationCommandType.ChatInput
 	? (interaction: ChatInputCommandInteraction) => unknown
 	: T extends ApplicationCommandType.User
 	? (interaction: UserContextMenuCommandInteraction) => unknown
@@ -40,9 +40,10 @@ type RunMethod<T extends ApplicationCommandType> = T extends ApplicationCommandT
 	? (interaction: MessageContextMenuCommandInteraction) => unknown
 	: never;
 
-type ChatInputOnly<CommandType extends ApplicationCommandType, T> = CommandType extends ApplicationCommandType.ChatInput
-	? T | undefined
-	: never;
+export type ChatInputOnly<
+	CommandType extends ApplicationCommandType,
+	T
+> = CommandType extends ApplicationCommandType.ChatInput ? T | undefined : never;
 
 export interface CommandData<T extends ApplicationCommandType = ApplicationCommandType.ChatInput> {
 	type: T;
