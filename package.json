@@ -3,6 +3,9 @@
 	"version": "0.0.1",
 	"description": "Dead simple discord.js slash command framework",
 	"main": "dist/index.js",
+	"scripts": {
+		"lint": "npx eslint src/**/*.ts"
+	},
 	"types": "dist/index.d.ts",
 	"type": "module",
 	"author": {
@@ -14,6 +17,9 @@
 	},
 	"license": "MIT",
 	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^5.14.0",
+		"@typescript-eslint/parser": "^5.14.0",
+		"eslint": "^8.10.0",
 		"typescript": "^4.5.5"
 	},
 	"dependencies": {
