@@ -1,4 +1,4 @@
-import { ApplicationCommandType, Client, ClientEvents, Collection } from "discord.js";
+import { ApplicationCommandType, Client, type ClientEvents, type ClientOptions, Collection } from "discord.js";
 import { resolveModules } from "../util/resolveModules.js";
 import { interactionListener } from "../util/interactionListener.js";
 import { Command } from "./Command.js";
@@ -7,9 +7,10 @@ import { container } from "./Container.js";
 import { Inhibitor } from "./Inhibitor.js";
 
 /**
- * Singleton class for Iubus. This class sets up and controls all the logic needed for the framework to function after calling init().
+ * The entry point to Iubus.
+ * This serves as both a discord.js client and a singleton instance for Iubus that is processing everything to make the framework function.
  */
-export class Iubus implements IubusData {
+export class IubusClient extends Client {
 	/** The directory containing your command files. This has to be relative to where you start your node process. */
 	public readonly commandDir?: string;
 	public readonly eventDir?: string;
@@ -18,7 +19,9 @@ export class Iubus implements IubusData {
 	public readonly inhibitors: Collection<string, Inhibitor>;
 	#initialized = false;
 
-	constructor(data: IubusData) {
+	constructor(data: IubusClientOptions) {
+		super(data);
+
 		this.commandDir = data.commandDir;
 		this.eventDir = data.eventDir;
 		this.inhibitorDir = data.inhibitorDir;
@@ -26,7 +29,7 @@ export class Iubus implements IubusData {
 		this.inhibitors = new Collection();
 	}
 
-	public async init(client: Client) {
+	public async login(token?: string) {
 		if (this.#initialized) throw new Error("Cannot initialize twice.");
 
 		if (this.commandDir) {
@@ -38,7 +41,7 @@ export class Iubus implements IubusData {
 				this.commands.set(cmd.name, cmd);
 			}
 
-			client.on("interactionCreate", async (interaction) => {
+			this.on("interactionCreate", async (interaction) => {
 				await interactionListener(interaction, this.commands, this.inhibitors);
 			});
 		}
@@ -49,11 +52,11 @@ export class Iubus implements IubusData {
 			>[];
 			for (const event of events) {
 				if (event.once) {
-					client.once(event.name, (...args: ClientEvents[typeof event.name]) => {
+					this.once(event.name, (...args: ClientEvents[typeof event.name]) => {
 						event.run(...args);
 					});
 				} else {
-					client.on(event.name, (...args: ClientEvents[typeof event.name]) => {
+					this.on(event.name, (...args: ClientEvents[typeof event.name]) => {
 						event.run(...args);
 					});
 				}
@@ -71,13 +74,14 @@ export class Iubus implements IubusData {
 			}
 		}
 
-		container.client = client;
-		container.iubus = this;
+		container.client = this;
 		this.#initialized = true;
+
+		return super.login(token);
 	}
 }
 
-export interface IubusData {
+export interface IubusClientOptions extends ClientOptions {
 	commandDir?: string;
 	eventDir?: string;
 	inhibitorDir?: string;
