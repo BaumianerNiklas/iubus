@@ -5,6 +5,7 @@ import { Command } from "./Command.js";
 import { Event } from "./Event.js";
 import { container } from "./Container.js";
 import { Inhibitor } from "./Inhibitor.js";
+import { deployOnChange, DeployOptions } from "../util/commandDeployment.js";
 
 /**
  * The entry point to Iubus.
@@ -15,6 +16,7 @@ export class IubusClient extends Client {
 	public readonly commandDir?: string;
 	public readonly eventDir?: string;
 	public readonly inhibitorDir?: string;
+	public readonly deploy?: DeployOptions & { deployOnChange?: boolean };
 	public readonly commands: Collection<string, Command<ApplicationCommandType>>;
 	public readonly inhibitors: Collection<string, Inhibitor>;
 	#initialized = false;
@@ -25,6 +27,8 @@ export class IubusClient extends Client {
 		this.commandDir = data.commandDir;
 		this.eventDir = data.eventDir;
 		this.inhibitorDir = data.inhibitorDir;
+		this.deploy = data.deploy;
+
 		this.commands = new Collection();
 		this.inhibitors = new Collection();
 	}
@@ -39,6 +43,11 @@ export class IubusClient extends Client {
 			)) as Command<ApplicationCommandType>[];
 			for (const cmd of commands) {
 				this.commands.set(cmd.name, cmd);
+			}
+
+			if (this.deploy?.deployOnChange) {
+				// TODO: figure out a way to do this without having the client logged in
+				this.once("ready", async () => await deployOnChange(this, this.deploy!)); // Apparently TS doesn't want to infer deploy as non-null?
 			}
 
 			this.on("interactionCreate", async (interaction) => {
@@ -85,4 +94,5 @@ export interface IubusClientOptions extends ClientOptions {
 	commandDir?: string;
 	eventDir?: string;
 	inhibitorDir?: string;
+	deploy?: DeployOptions & { deployOnChange?: boolean };
 }
