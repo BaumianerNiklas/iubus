@@ -1,13 +1,12 @@
-import { Command } from "../structures/Command.js";
+import { BaseCommand } from "../structures/Command.js";
 import { resolveModules } from "./resolveModules.js";
 import { REST } from "@discordjs/rest";
 import { GLOBAL_DEPLOY_URL, GUILD_DEPLOY_URL } from "./constants.js";
 import {
 	type ApplicationCommand,
-	ApplicationCommandType,
 	Collection,
-	ApplicationCommandData,
-	ApplicationCommandOptionData,
+	type ApplicationCommandData,
+	type ApplicationCommandOptionData,
 } from "discord.js";
 import type { IubusClient } from "../structures/IubusClient.js";
 import { deepCompare } from "./deepCompare.js";
@@ -26,11 +25,8 @@ export async function internalDeployCommands(commands: ApplicationCommandData[],
 }
 
 export async function deployCommands(options: DeployOptions & { commandDir: string }) {
-	const commands = (await resolveModules(
-		options.commandDir,
-		(mod) => mod instanceof Command
-	)) as Command<ApplicationCommandType>[];
-	await internalDeployCommands(commands, options);
+	const commands = (await resolveModules(options.commandDir, (mod) => mod instanceof BaseCommand)) as BaseCommand[];
+	await internalDeployCommands(transformCommands(commands), options);
 }
 
 export async function deployOnChange(client: IubusClient, options: DeployOptions) {
@@ -63,7 +59,7 @@ export function sortCommands(commands: ApplicationCommandData[] | ApplicationCom
 
 /** Transforms array of Iubus Commands or discord.js Application Commands to normalized Application Commands that can be sent to the Discord API */
 export function transformCommands(
-	commands: Command<ApplicationCommandType>[] | ApplicationCommand[] | ApplicationCommandData[]
+	commands: BaseCommand[] | ApplicationCommand[] | ApplicationCommandData[]
 ): ApplicationCommandData[] {
 	return commands.map((c) => {
 		return {

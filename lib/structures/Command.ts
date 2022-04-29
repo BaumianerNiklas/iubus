@@ -1,62 +1,84 @@
 import {
-	ApplicationCommandOptionData,
+	type ApplicationCommandOptionData,
 	ApplicationCommandType,
-	AutocompleteInteraction,
-	ChatInputCommandInteraction,
-	MessageContextMenuCommandInteraction,
-	UserContextMenuCommandInteraction,
+	type AutocompleteInteraction,
+	type ChatInputCommandInteraction,
+	type MessageContextMenuCommandInteraction,
+	type UserContextMenuCommandInteraction,
 } from "discord.js";
 import type { Inhibitor } from "./Inhibitor.js";
 
-export class Command<T extends ApplicationCommandType> implements CommandData<T> {
-	public readonly type: T;
+export abstract class BaseCommand {
+	public abstract readonly type: ApplicationCommandType;
 	public readonly name: string;
-	public readonly description: string;
-	public readonly options?: ChatInputOnly<T, ApplicationCommandOptionData[]>;
-	public readonly subcommands?: ChatInputOnly<T, Subcommands>;
 	public readonly inhibitors?: Array<string | Inhibitor>;
 
-	public run?: RunMethod<T>;
-	public autocomplete?: ChatInputOnly<T, (interaction: AutocompleteInteraction) => unknown>;
+	public abstract run?: ChatInputRunMethod | UserContextMenuRunMethod | MessageContextMenuRunMethod;
 
-	constructor(data: CommandData<T>) {
-		this.type = data.type;
+	constructor(data: BaseCommandData) {
 		this.name = data.name;
-		this.description = this.type === ApplicationCommandType.ChatInput ? data.description : "";
-		this.options = data.options;
-		this.run = data.run;
-
-		if (data.subcommands) this.subcommands = data.subcommands;
-		if (data.inhibitors) this.inhibitors = data.inhibitors;
-		if (data.autocomplete) this.autocomplete = data.autocomplete;
+		this.inhibitors = data.inhibitors;
 	}
 }
 
-export type RunMethod<T extends ApplicationCommandType> = T extends ApplicationCommandType.ChatInput
-	? (interaction: ChatInputCommandInteraction) => unknown
-	: T extends ApplicationCommandType.User
-	? (interaction: UserContextMenuCommandInteraction) => unknown
-	: T extends ApplicationCommandType.Message
-	? (interaction: MessageContextMenuCommandInteraction) => unknown
-	: never;
+export class ChatInputCommand extends BaseCommand {
+	public readonly type = ApplicationCommandType.ChatInput;
+	public readonly description: string;
+	public readonly options?: ApplicationCommandOptionData[];
+	public readonly subcommands?: Subcommands;
 
-export type ChatInputOnly<
-	CommandType extends ApplicationCommandType,
-	T
-> = CommandType extends ApplicationCommandType.ChatInput ? T | undefined : never;
+	public run?: ChatInputRunMethod;
+	public autocomplete?: (interaction: AutocompleteInteraction) => unknown;
 
-export interface CommandData<T extends ApplicationCommandType = ApplicationCommandType.ChatInput> {
-	type: T;
-	name: string;
-	description: string;
-	options?: ChatInputOnly<T, ApplicationCommandOptionData[]>;
-	subcommands?: ChatInputOnly<T, Subcommands>;
-	inhibitors?: Array<string | Inhibitor>;
-	run?: RunMethod<T>;
-	autocomplete?: ChatInputOnly<T, (interaction: AutocompleteInteraction) => unknown>;
+	constructor(data: ChatInputCommandData) {
+		super(data);
+		this.description = data.description;
+		this.options = data.options ?? [];
+		this.subcommands = data.subcommands;
+
+		this.run = data.run;
+		this.autocomplete = data.autocomplete;
+	}
+}
+
+export class UserContextMenuCommand extends BaseCommand {
+	public readonly type = ApplicationCommandType.User;
+	public run?: UserContextMenuRunMethod;
+
+	constructor(data: Omit<BaseCommandData, "run"> & { run?: UserContextMenuRunMethod }) {
+		super(data);
+		this.run = data.run;
+	}
+}
+
+export class MessageContextMenuCommand extends BaseCommand {
+	public readonly type = ApplicationCommandType.Message;
+	public run?: MessageContextMenuRunMethod;
+
+	constructor(data: Omit<BaseCommandData, "run"> & { run?: MessageContextMenuRunMethod }) {
+		super(data);
+		this.run = data.run;
+	}
 }
 
 export type Subcommands = Record<string, SubcommandMethod | SubcommandGroup>;
-
 export type SubcommandMethod = (interaction: ChatInputCommandInteraction) => unknown;
 export type SubcommandGroup = Record<string, SubcommandMethod>;
+
+export interface BaseCommandData {
+	name: string;
+	inhibitors?: Array<string | Inhibitor>;
+	run?: ChatInputRunMethod | UserContextMenuRunMethod | MessageContextMenuRunMethod;
+}
+
+export interface ChatInputCommandData extends BaseCommandData {
+	description: string;
+	options?: ApplicationCommandOptionData[];
+	subcommands?: Subcommands;
+	autocomplete?: (interaction: AutocompleteInteraction) => unknown;
+	run?: (interaction: ChatInputCommandInteraction) => unknown;
+}
+
+export type ChatInputRunMethod = (interaction: ChatInputCommandInteraction) => unknown;
+export type UserContextMenuRunMethod = (interaction: UserContextMenuCommandInteraction) => unknown;
+export type MessageContextMenuRunMethod = (interaction: MessageContextMenuCommandInteraction) => unknown;

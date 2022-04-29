@@ -1,7 +1,7 @@
-import { ApplicationCommandType, Client, type ClientEvents, type ClientOptions, Collection } from "discord.js";
+import { Client, type ClientEvents, type ClientOptions, Collection } from "discord.js";
 import { resolveModules } from "../util/resolveModules.js";
 import { interactionListener } from "../util/interactionListener.js";
-import { Command } from "./Command.js";
+import { BaseCommand } from "./Command.js";
 import { Event } from "./Event.js";
 import { container } from "./Container.js";
 import { Inhibitor } from "./Inhibitor.js";
@@ -17,7 +17,7 @@ export class IubusClient extends Client {
 	public readonly eventDir?: string;
 	public readonly inhibitorDir?: string;
 	public readonly deploy?: DeployOptions & { deployOnChange?: boolean };
-	public readonly commands: Collection<string, Command<ApplicationCommandType>>;
+	public readonly commands: Collection<string, BaseCommand>;
 	public readonly inhibitors: Collection<string, Inhibitor>;
 	#initialized = false;
 
@@ -39,8 +39,8 @@ export class IubusClient extends Client {
 		if (this.commandDir) {
 			const commands = (await resolveModules(
 				this.commandDir,
-				(mod) => mod instanceof Command
-			)) as Command<ApplicationCommandType>[];
+				(mod) => mod instanceof BaseCommand
+			)) as BaseCommand[];
 			for (const cmd of commands) {
 				this.commands.set(cmd.name, cmd);
 			}

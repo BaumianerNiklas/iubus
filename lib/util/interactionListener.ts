@@ -1,10 +1,17 @@
-import { ApplicationCommandType, Collection, Interaction } from "discord.js";
+import { Collection, type Interaction } from "discord.js";
 import { Inhibitor } from "../structures/Inhibitor.js";
-import type { Command, SubcommandGroup, SubcommandMethod } from "../structures/Command.js";
+import {
+	BaseCommand,
+	ChatInputCommand,
+	MessageContextMenuCommand,
+	SubcommandGroup,
+	SubcommandMethod,
+	UserContextMenuCommand,
+} from "../structures/Command.js";
 
 export async function interactionListener(
 	interaction: Interaction,
-	commands: Collection<string, Command<ApplicationCommandType>>,
+	commands: Collection<string, BaseCommand>,
 	inhibitors: Collection<string, Inhibitor>
 ) {
 	if (!interaction.isAutocomplete() && !interaction.isCommand()) return;
@@ -29,36 +36,32 @@ export async function interactionListener(
 	}
 
 	// Autocomplete
-	if (interaction.isAutocomplete()) {
+	if (interaction.isAutocomplete() && command instanceof ChatInputCommand) {
 		if (command.autocomplete) command.autocomplete(interaction);
 	}
 
 	// Regular slash commands
-	if (interaction.isChatInputCommand() && command.type === ApplicationCommandType.ChatInput) {
-		const cmd = command as Command<ApplicationCommandType.ChatInput>; // This type cast is safe but TS doesn't want to infer the generic
-
+	if (interaction.isChatInputCommand() && command instanceof ChatInputCommand) {
 		// Subcommand handling
 		const subcmd = interaction.options.getSubcommand(false);
 		const subgroup = interaction.options.getSubcommandGroup(false);
 
-		if (cmd.subcommands && (subcmd || subgroup)) {
-			if (subgroup && subcmd && typeof cmd.subcommands[subgroup] === "object") {
-				const group = cmd.subcommands[subgroup] as SubcommandGroup; // Again, this type cast *should* be safe
+		if (command.subcommands && (subcmd || subgroup)) {
+			if (subgroup && subcmd && typeof command.subcommands[subgroup] === "object") {
+				const group = command.subcommands[subgroup] as SubcommandGroup; // Again, this type cast *should* be safe
 				if (typeof group[subcmd] === "function") await group[subcmd](interaction);
-			} else if (!subgroup && subcmd && typeof cmd.subcommands[subcmd] === "function") {
-				const method = cmd.subcommands[subcmd] as SubcommandMethod;
+			} else if (!subgroup && subcmd && typeof command.subcommands[subcmd] === "function") {
+				const method = command.subcommands[subcmd] as SubcommandMethod;
 				await method(interaction);
 			}
 		}
 
-		if (cmd.run) await cmd.run(interaction);
+		if (command.run) await command.run(interaction);
 
 		// Context menu commands
-	} else if (interaction.isUserContextMenuCommand() && command.type === ApplicationCommandType.User) {
-		const cmd = command as Command<ApplicationCommandType.User>;
-		if (cmd.run) await cmd.run(interaction);
-	} else if (interaction.isMessageContextMenuCommand() && command.type === ApplicationCommandType.Message) {
-		const cmd = command as Command<ApplicationCommandType.Message>;
-		if (cmd.run) await cmd.run(interaction);
+	} else if (interaction.isUserContextMenuCommand() && command instanceof UserContextMenuCommand) {
+		if (command.run) await command.run(interaction);
+	} else if (interaction.isMessageContextMenuCommand() && command instanceof MessageContextMenuCommand) {
+		if (command.run) await command.run(interaction);
 	}
 }
