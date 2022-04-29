@@ -20,7 +20,7 @@ export async function internalDeployCommands(commands: ApplicationCommandData[],
 		: GUILD_DEPLOY_URL(options.applicationId, options.guildId!);
 
 	rest.put(route, {
-		body: transformCommands(commands),
+		body: commands,
 	});
 }
 
