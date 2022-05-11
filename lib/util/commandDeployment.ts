@@ -25,12 +25,14 @@ export async function internalDeployCommands(commands: ApplicationCommandData[],
 }
 
 export async function deployCommands(options: DeployOptions & { commandDir: string }) {
-	const commands = (await resolveModules(options.commandDir, (mod) => mod instanceof BaseCommand)) as BaseCommand[];
+	let commands = (await resolveModules(options.commandDir, (mod) => mod instanceof BaseCommand)) as BaseCommand[];
+	if (options.deployGlobally) commands = commands.filter((c) => !c.dontDeployGlobally);
 	await internalDeployCommands(transformCommands(commands), options);
 }
 
 export async function deployOnChange(client: IubusClient, options: DeployOptions) {
-	const local = client.commands;
+	let local = client.commands;
+	if (options.deployGlobally) local = local.filter((c) => !c.dontDeployGlobally);
 	let existing: Collection<string, ApplicationCommand>;
 
 	if (options.deployGlobally) {

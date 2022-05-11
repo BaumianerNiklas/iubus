@@ -11,6 +11,7 @@ import type { Inhibitor } from "./Inhibitor.js";
 export abstract class BaseCommand {
 	public abstract readonly type: ApplicationCommandType;
 	public readonly name: string;
+	public readonly dontDeployGlobally: boolean;
 	public readonly inhibitors?: Array<string | Inhibitor>;
 
 	public abstract run?: ChatInputRunMethod | UserContextMenuRunMethod | MessageContextMenuRunMethod;
@@ -18,6 +19,7 @@ export abstract class BaseCommand {
 	constructor(data: BaseCommandData) {
 		this.name = data.name;
 		this.inhibitors = data.inhibitors;
+		this.dontDeployGlobally = data.dontDeployGlobally ?? false;
 	}
 }
 
@@ -67,6 +69,7 @@ export type SubcommandGroup = Record<string, SubcommandMethod>;
 
 export interface BaseCommandData {
 	name: string;
+	dontDeployGlobally?: boolean;
 	inhibitors?: Array<string | Inhibitor>;
 	run?: ChatInputRunMethod | UserContextMenuRunMethod | MessageContextMenuRunMethod;
 }
