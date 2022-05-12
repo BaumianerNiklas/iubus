@@ -25,7 +25,7 @@ export async function internalDeployCommands(commands: ApplicationCommandData[],
 }
 
 export async function deployCommands(options: DeployOptions & { commandDir: string }) {
-	let commands = (await resolveModules(options.commandDir, (mod) => mod instanceof BaseCommand)) as BaseCommand[];
+	let commands = await resolveModules(options.commandDir, (mod): mod is BaseCommand => mod instanceof BaseCommand);
 	if (options.deployGlobally) commands = commands.filter((c) => !c.dontDeployGlobally);
 	await internalDeployCommands(transformCommands(commands), options);
 }

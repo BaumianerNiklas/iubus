@@ -37,10 +37,10 @@ export class IubusClient extends Client {
 		if (this.#initialized) throw new Error("Cannot initialize twice.");
 
 		if (this.commandDir) {
-			const commands = (await resolveModules(
+			const commands = await resolveModules(
 				this.commandDir,
-				(mod) => mod instanceof BaseCommand
-			)) as BaseCommand[];
+				(mod): mod is BaseCommand => mod instanceof BaseCommand
+			);
 			for (const cmd of commands) {
 				this.commands.set(cmd.name, cmd);
 			}
@@ -56,9 +56,10 @@ export class IubusClient extends Client {
 		}
 
 		if (this.eventDir) {
-			const events = (await resolveModules(this.eventDir, (mod) => mod instanceof Event)) as Event<
-				keyof ClientEvents
-			>[];
+			const events = await resolveModules(
+				this.eventDir,
+				(mod): mod is Event<keyof ClientEvents> => mod instanceof Event
+			);
 			for (const event of events) {
 				if (event.once) {
 					this.once(event.name, (...args: ClientEvents[typeof event.name]) => {
@@ -73,10 +74,10 @@ export class IubusClient extends Client {
 		}
 
 		if (this.inhibitorDir) {
-			const inhibitors = (await resolveModules(
+			const inhibitors = await resolveModules(
 				this.inhibitorDir,
-				(mod) => mod instanceof Inhibitor
-			)) as Inhibitor[];
+				(mod): mod is Inhibitor => mod instanceof Inhibitor
+			);
 
 			for (const inhibitor of inhibitors) {
 				this.inhibitors.set(inhibitor.name, inhibitor);
