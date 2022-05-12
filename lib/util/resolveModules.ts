@@ -5,7 +5,7 @@ import { join } from "node:path";
  * Recursively resolves modules in path and filters them based on the predicate
  */
 export async function resolveModules<T>(path: string, predicate: (module: unknown) => module is T): Promise<T[]> {
-	const result: unknown[] = [];
+	const result: T[] = [];
 
 	const files = await readdir(join(process.cwd(), path));
 	for (const file of files) {
@@ -23,5 +23,5 @@ export async function resolveModules<T>(path: string, predicate: (module: unknow
 			}
 		}
 	}
-	return result as T[];
+	return result;
 }
