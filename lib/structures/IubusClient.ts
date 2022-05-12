@@ -12,10 +12,7 @@ import { deployOnChange, DeployOptions } from "../util/commandDeployment.js";
  * This serves as both a discord.js client and a singleton instance for Iubus that is processing everything to make the framework function.
  */
 export class IubusClient extends Client {
-	/** The directory containing your command files. This has to be relative to where you start your node process. */
-	public readonly commandDir?: string;
-	public readonly eventDir?: string;
-	public readonly inhibitorDir?: string;
+	public readonly dirs?: DirectoryOptions;
 	public readonly deploy?: DeployOptions & { deployOnChange?: boolean };
 	public readonly commands: Collection<string, BaseCommand>;
 	public readonly inhibitors: Collection<string, Inhibitor>;
@@ -24,9 +21,7 @@ export class IubusClient extends Client {
 	constructor(data: IubusClientOptions) {
 		super(data);
 
-		this.commandDir = data.commandDir;
-		this.eventDir = data.eventDir;
-		this.inhibitorDir = data.inhibitorDir;
+		this.dirs = data.dirs;
 		this.deploy = data.deploy;
 
 		this.commands = new Collection();
@@ -36,9 +31,9 @@ export class IubusClient extends Client {
 	public async login(token?: string) {
 		if (this.#initialized) throw new Error("Cannot initialize twice.");
 
-		if (this.commandDir) {
+		if (this.dirs?.commands) {
 			const commands = await resolveModules(
-				this.commandDir,
+				this.dirs.commands,
 				(mod): mod is BaseCommand => mod instanceof BaseCommand
 			);
 			for (const cmd of commands) {
@@ -55,9 +50,9 @@ export class IubusClient extends Client {
 			});
 		}
 
-		if (this.eventDir) {
+		if (this.dirs?.events) {
 			const events = await resolveModules(
-				this.eventDir,
+				this.dirs.events,
 				(mod): mod is Event<keyof ClientEvents> => mod instanceof Event
 			);
 			for (const event of events) {
@@ -73,9 +68,9 @@ export class IubusClient extends Client {
 			}
 		}
 
-		if (this.inhibitorDir) {
+		if (this.dirs?.inhibitors) {
 			const inhibitors = await resolveModules(
-				this.inhibitorDir,
+				this.dirs.inhibitors,
 				(mod): mod is Inhibitor => mod instanceof Inhibitor
 			);
 
@@ -92,8 +87,12 @@ export class IubusClient extends Client {
 }
 
 export interface IubusClientOptions extends ClientOptions {
-	commandDir?: string;
-	eventDir?: string;
-	inhibitorDir?: string;
+	dirs?: DirectoryOptions;
 	deploy?: DeployOptions & { deployOnChange?: boolean };
+}
+
+export interface DirectoryOptions {
+	commands?: string;
+	events?: string;
+	inhibitors?: string;
 }
