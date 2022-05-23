@@ -1,4 +1,4 @@
-import { Client, ClientEvents, Message } from "discord.js";
+import type { ClientEvents } from "discord.js";
 
 export class Event<E extends keyof ClientEvents = keyof ClientEvents> implements EventData<E> {
 	public readonly name: E;
