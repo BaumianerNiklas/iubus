@@ -4,7 +4,7 @@
 	"description": "Dead simple discord.js slash command framework",
 	"main": "dist/index.js",
 	"scripts": {
-		"lint": "npx eslint src/**/*.ts"
+		"lint": "npx eslint lib/**/*.ts"
 	},
 	"types": "dist/index.d.ts",
 	"type": "module",
