@@ -51,10 +51,7 @@ export class IubusClient extends Client {
 		}
 
 		if (this.dirs?.events) {
-			const events = await resolveModules(
-				this.dirs.events,
-				(mod): mod is Event<keyof ClientEvents> => mod instanceof Event
-			);
+			const events = await resolveModules(this.dirs.events, (mod): mod is Event => mod instanceof Event);
 			for (const event of events) {
 				if (event.once) {
 					this.once(event.name, (...args: ClientEvents[typeof event.name]) => {
