@@ -1,4 +1,4 @@
-import { Collection, type Interaction } from "discord.js";
+import { type AnyInteraction, Collection, InteractionType } from "discord.js";
 import { Inhibitor } from "../structures/Inhibitor.js";
 import {
 	BaseCommand,
@@ -10,18 +10,22 @@ import {
 } from "../structures/Command.js";
 
 export async function interactionListener(
-	interaction: Interaction,
+	interaction: AnyInteraction,
 	commands: Collection<string, BaseCommand>,
 	inhibitors: Collection<string, Inhibitor>
 ) {
-	if (!interaction.isAutocomplete() && !interaction.isCommand()) return;
+	if (
+		interaction.type !== InteractionType.ApplicationCommand &&
+		interaction.type !== InteractionType.ApplicationCommandAutocomplete
+	)
+		return;
 
 	const { commandName } = interaction;
 	const command = commands.get(commandName);
 	if (!command) return;
 
 	// Inhibitor checks
-	if (command.inhibitors && interaction.isCommand()) {
+	if (command.inhibitors && interaction.type === InteractionType.ApplicationCommand) {
 		for (const selectedInhibitor of command.inhibitors) {
 			let inhibitor: Inhibitor | undefined;
 			if (typeof selectedInhibitor === "string") {
