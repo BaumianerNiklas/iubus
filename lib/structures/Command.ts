@@ -5,12 +5,14 @@ import {
 	type ChatInputCommandInteraction,
 	type MessageContextMenuCommandInteraction,
 	type UserContextMenuCommandInteraction,
+	type LocalizationMap,
 } from "discord.js";
 import type { Inhibitor } from "./Inhibitor.js";
 
 export abstract class BaseCommand {
 	public abstract readonly type: ApplicationCommandType;
 	public readonly name: string;
+	public readonly nameLocalizations?: LocalizationMap;
 	public readonly dontDeployGlobally: boolean;
 	public readonly inhibitors?: Array<string | Inhibitor>;
 
@@ -18,6 +20,7 @@ export abstract class BaseCommand {
 
 	constructor(data: BaseCommandData) {
 		this.name = data.name;
+		this.nameLocalizations = data.nameLocalizations;
 		this.inhibitors = data.inhibitors;
 		this.dontDeployGlobally = data.dontDeployGlobally ?? false;
 	}
@@ -26,6 +29,7 @@ export abstract class BaseCommand {
 export class ChatInputCommand extends BaseCommand {
 	public readonly type = ApplicationCommandType.ChatInput;
 	public readonly description: string;
+	public readonly descriptionLocalizations?: LocalizationMap;
 	public readonly options?: ApplicationCommandOptionData[];
 	public readonly subcommands?: Subcommands;
 
@@ -35,6 +39,7 @@ export class ChatInputCommand extends BaseCommand {
 	constructor(data: ChatInputCommandData) {
 		super(data);
 		this.description = data.description;
+		this.descriptionLocalizations = data.descriptionLocalizations;
 		this.options = data.options ?? [];
 		this.subcommands = data.subcommands;
 
@@ -69,6 +74,7 @@ export type SubcommandGroup = Record<string, SubcommandMethod>;
 
 export interface BaseCommandData {
 	name: string;
+	nameLocalizations?: LocalizationMap;
 	dontDeployGlobally?: boolean;
 	inhibitors?: Array<string | Inhibitor>;
 	run?: ChatInputRunMethod | UserContextMenuRunMethod | MessageContextMenuRunMethod;
@@ -76,6 +82,7 @@ export interface BaseCommandData {
 
 export interface ChatInputCommandData extends BaseCommandData {
 	description: string;
+	descriptionLocalizations?: LocalizationMap;
 	options?: ApplicationCommandOptionData[];
 	subcommands?: Subcommands;
 	autocomplete?: (interaction: AutocompleteInteraction) => unknown;

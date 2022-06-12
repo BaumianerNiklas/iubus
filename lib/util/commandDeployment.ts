@@ -7,6 +7,7 @@ import {
 	Collection,
 	type ApplicationCommandData,
 	type ApplicationCommandOptionData,
+	type ApplicationCommandOption,
 } from "discord.js";
 import type { IubusClient } from "../structures/IubusClient.js";
 import { deepCompare } from "./deepCompare.js";
@@ -66,11 +67,21 @@ export function transformCommands(
 	return commands.map((c) => {
 		return {
 			name: c.name,
+			name_localizations: c.nameLocalizations,
 			type: c.type,
 			description: "description" in c ? c.description : "",
-			options: "options" in c && c.options ? c.options : [],
+			description_localizations: "descriptionLocalizations" in c ? c.descriptionLocalizations ?? {} : {},
+			options: "options" in c && c.options ? c.options.map(transformOption) : [],
 		};
 	});
+}
+
+export function transformOption(option: ApplicationCommandOption | ApplicationCommandOptionData) {
+	return {
+		...option,
+		name_localizations: option.nameLocalizations ?? {},
+		description_localizations: option.descriptionLocalizations,
+	};
 }
 
 export type DeployOptions = LocalDeployOptions | GlobalDeployOptions;
