@@ -12,8 +12,7 @@ import {
 import type { IubusClient } from "../structures/IubusClient.js";
 import { deepCompare } from "./deepCompare.js";
 
-// TODO: better name
-export async function internalDeployCommands(commands: ApplicationCommandData[], options: DeployOptions) {
+export async function baseDeployCommands(commands: ApplicationCommandData[], options: DeployOptions) {
 	const rest = new REST({ version: "9" }).setToken(options.token);
 
 	const route = options.deployGlobally
@@ -28,7 +27,7 @@ export async function internalDeployCommands(commands: ApplicationCommandData[],
 export async function deployCommands(options: DeployOptions & { commandDir: string }) {
 	let commands = await resolveModules(options.commandDir, (mod): mod is BaseCommand => mod instanceof BaseCommand);
 	if (options.deployGlobally) commands = commands.filter((c) => !c.dontDeployGlobally);
-	await internalDeployCommands(transformCommands(commands), options);
+	await baseDeployCommands(transformCommands(commands), options);
 }
 
 export async function deployOnChange(client: IubusClient, options: DeployOptions) {
@@ -48,7 +47,7 @@ export async function deployOnChange(client: IubusClient, options: DeployOptions
 	const equal = deepCompare(sortCommands(transformedLocal), sortCommands(transformedExisting));
 
 	if (equal) return;
-	await internalDeployCommands(transformedLocal, options);
+	await baseDeployCommands(transformedLocal, options);
 }
 
 export function sortCommands(commands: ApplicationCommandData[] | ApplicationCommandOptionData[]) {
