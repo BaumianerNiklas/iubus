@@ -22,12 +22,11 @@ const client = new IubusClient({
     commandDir: "./dist/commands/",
     eventDir: "./dist/events",
     deploy: {
-        deployOnChange: true, // Re-deploy commands whenever Iubus detects a change in the command data
         token: "YOUR_TOKEN",
         applicationId: "YOUR_APPLICATION_ID",
-        commandDir: "./dist/commands/",
+        guildId: "YOUR_GUILD_ID", // will be ignored if deployGlobally is set to true
         deployGlobally: true, // defaults to false
-        guildId: "YOUR_GUILD_ID", // the guild to deploy to. Will be ignored if deployGlobally is set to true
+        deployOnChange: true, // re-deploy commands whenever Iubus detects a change in the command data
     }
 });
 
