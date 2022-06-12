@@ -40,7 +40,7 @@ export async function interactionListener(
 	}
 
 	// Autocomplete
-	if (interaction.isAutocomplete() && command instanceof ChatInputCommand) {
+	if (interaction.type === InteractionType.ApplicationCommandAutocomplete && command instanceof ChatInputCommand) {
 		if (command.autocomplete) command.autocomplete(interaction);
 	}
 
