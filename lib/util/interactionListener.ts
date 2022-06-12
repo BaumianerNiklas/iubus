@@ -9,6 +9,10 @@ import {
 	UserContextMenuCommand,
 } from "../structures/Command.js";
 
+/**
+ * The interaction listenser Iubus sets up on the client. This first runs inhibitors and then calls the corresponding method on the commands.
+ * @internal
+ */
 export async function interactionListener(
 	interaction: AnyInteraction,
 	commands: Collection<string, BaseCommand>,

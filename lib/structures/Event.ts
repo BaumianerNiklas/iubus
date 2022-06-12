@@ -1,5 +1,8 @@
 import type { ClientEvents } from "discord.js";
 
+/**
+ * Class for creating event listeners.
+ */
 export class Event<E extends keyof ClientEvents = keyof ClientEvents> implements EventData<E> {
 	public readonly name: E;
 	public readonly once: boolean;

@@ -1,7 +1,10 @@
-/** Recursive function that compares a and b and checks if they show all the same properties.
+/**
+ * Recursive function that compares a and b and checks if they show all the same properties.
  * For objects, this only checks if all of the properties of a are in b and equal. If b has properties that a doesn't, this still returns true.
  *
- * This function is not ideal outside of internal uses in Iubus because of the above reason and this only working on primitives, arrays, and plain objects.*/
+ * This function is not ideal outside of internal uses in Iubus because of the above reason and this only working on primitives, arrays, and plain objects.
+ * @internal
+ */
 export function deepCompare(a: unknown, b: unknown): boolean {
 	// Primitive checks (strings, number, booleans, null, undefined, NaN)
 	if (Object.is(a, b)) return true;

@@ -2,7 +2,8 @@ import { readdir, lstat } from "node:fs/promises";
 import { join } from "node:path";
 
 /**
- * Recursively resolves modules in path and filters them based on the predicate
+ * Recursively resolves modules in path and filters them based on the predicate.
+ * @internal
  */
 export async function resolveModules<T>(path: string, predicate: (module: unknown) => module is T): Promise<T[]> {
 	const result: T[] = [];

@@ -10,6 +10,10 @@ import {
 } from "discord.js";
 import type { Inhibitor } from "./Inhibitor.js";
 
+/**
+ * An abstract base class for all other command classes. This contains properties every command can have, like name, permissions, and inhibitors.
+ * @internal
+ */
 export abstract class BaseCommand {
 	public abstract readonly type: ApplicationCommandType;
 	public readonly name: string;
@@ -31,6 +35,9 @@ export abstract class BaseCommand {
 	}
 }
 
+/**
+ * Class for creating CHAT_INPUT commands (application command type 1)
+ */
 export class ChatInputCommand extends BaseCommand {
 	public readonly type = ApplicationCommandType.ChatInput;
 	public readonly description: string;
@@ -53,6 +60,9 @@ export class ChatInputCommand extends BaseCommand {
 	}
 }
 
+/**
+ * Class for creating USER context menu commands (application command type 2)
+ */
 export class UserContextMenuCommand extends BaseCommand {
 	public readonly type = ApplicationCommandType.User;
 	public run?: UserContextMenuRunMethod;
@@ -63,6 +73,9 @@ export class UserContextMenuCommand extends BaseCommand {
 	}
 }
 
+/**
+ * Class for creating MESSAGE context menu commands (application command type 3)
+ */
 export class MessageContextMenuCommand extends BaseCommand {
 	public readonly type = ApplicationCommandType.Message;
 	public run?: MessageContextMenuRunMethod;
