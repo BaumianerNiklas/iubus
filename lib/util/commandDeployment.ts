@@ -70,6 +70,8 @@ export function transformCommands(
 			type: c.type,
 			description: "description" in c ? c.description : "",
 			description_localizations: "descriptionLocalizations" in c ? c.descriptionLocalizations ?? {} : {},
+			default_member_permissions: c.defaultMemberPermissions?.toString(),
+			dm_permission: c.dmPermission,
 			options: "options" in c && c.options ? c.options.map(transformOption) : [],
 		};
 	});

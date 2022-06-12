@@ -6,6 +6,7 @@ import {
 	type MessageContextMenuCommandInteraction,
 	type UserContextMenuCommandInteraction,
 	type LocalizationMap,
+	type Permissions,
 } from "discord.js";
 import type { Inhibitor } from "./Inhibitor.js";
 
@@ -13,6 +14,8 @@ export abstract class BaseCommand {
 	public abstract readonly type: ApplicationCommandType;
 	public readonly name: string;
 	public readonly nameLocalizations?: LocalizationMap;
+	public readonly defaultMemberPermissions?: Permissions | bigint | number;
+	public readonly dmPermission?: boolean;
 	public readonly dontDeployGlobally: boolean;
 	public readonly inhibitors?: Array<string | Inhibitor>;
 
@@ -21,6 +24,8 @@ export abstract class BaseCommand {
 	constructor(data: BaseCommandData) {
 		this.name = data.name;
 		this.nameLocalizations = data.nameLocalizations;
+		this.defaultMemberPermissions = data.defaultMemberPermissions;
+		this.dmPermission = data.dmPermission;
 		this.inhibitors = data.inhibitors;
 		this.dontDeployGlobally = data.dontDeployGlobally ?? false;
 	}
@@ -75,6 +80,8 @@ export type SubcommandGroup = Record<string, SubcommandMethod>;
 export interface BaseCommandData {
 	name: string;
 	nameLocalizations?: LocalizationMap;
+	defaultMemberPermissions?: Permissions | bigint | number;
+	dmPermission?: boolean;
 	dontDeployGlobally?: boolean;
 	inhibitors?: Array<string | Inhibitor>;
 	run?: ChatInputRunMethod | UserContextMenuRunMethod | MessageContextMenuRunMethod;
