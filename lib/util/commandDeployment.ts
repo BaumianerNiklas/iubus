@@ -101,5 +101,4 @@ export interface LocalDeployOptions extends DeployOptionData {
 
 export interface GlobalDeployOptions extends DeployOptionData {
 	deployGlobally: true;
-	guildId: never;
 }
