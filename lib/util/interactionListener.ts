@@ -39,7 +39,7 @@ export async function interactionListener(
 			}
 			if (!inhibitor) continue;
 			// Abort processing the interaction if an inhibitor inhibits the interaction
-			if (!inhibitor.run(interaction)) return;
+			if (inhibitor.run(interaction) == false) return;
 		}
 	}
 
