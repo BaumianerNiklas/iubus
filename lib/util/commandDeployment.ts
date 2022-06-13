@@ -1,13 +1,13 @@
 import { BaseCommand } from "../structures/Command.js";
 import { resolveModules } from "./resolveModules.js";
 import { REST } from "@discordjs/rest";
-import { GLOBAL_DEPLOY_URL, GUILD_DEPLOY_URL } from "./constants.js";
 import {
 	type ApplicationCommand,
-	Collection,
 	type ApplicationCommandData,
 	type ApplicationCommandOptionData,
 	type ApplicationCommandOption,
+	Collection,
+	Routes,
 } from "discord.js";
 import type { IubusClient } from "../structures/IubusClient.js";
 import { deepCompare } from "./deepCompare.js";
@@ -20,8 +20,8 @@ export async function baseDeployCommands(commands: ApplicationCommandData[], opt
 	const rest = new REST({ version: "9" }).setToken(options.token);
 
 	const route = options.deployGlobally
-		? GLOBAL_DEPLOY_URL(options.applicationId)
-		: GUILD_DEPLOY_URL(options.applicationId, options.guildId!);
+		? Routes.applicationCommands(options.applicationId)
+		: Routes.applicationGuildCommands(options.applicationId, options.guildId!);
 
 	rest.put(route, {
 		body: commands,
