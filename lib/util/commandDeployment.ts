@@ -21,7 +21,7 @@ export async function baseDeployCommands(commands: ApplicationCommandData[], opt
 
 	const route = options.deployGlobally
 		? Routes.applicationCommands(options.applicationId)
-		: Routes.applicationGuildCommands(options.applicationId, options.guildId!);
+		: Routes.applicationGuildCommands(options.applicationId, options.guildId);
 
 	rest.put(route, {
 		body: commands,
