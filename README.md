@@ -18,16 +18,16 @@ In your entry file:
 import { IubusClient } from "iubus";
 
 const client = new IubusClient({
-    intents: /* ... */,
-    commandDir: "./dist/commands/",
-    eventDir: "./dist/events",
-    deploy: {
-        token: "YOUR_TOKEN",
-        applicationId: "YOUR_APPLICATION_ID",
-        guildId: "YOUR_GUILD_ID", // will be ignored if deployGlobally is set to true
-        deployGlobally: true, // defaults to false
-        deployOnChange: true, // re-deploy commands whenever Iubus detects a change in the command data
-    }
+	intents: /* ... */,
+	commandDir: "./dist/commands/",
+	eventDir: "./dist/events",
+	deploy: {
+		token: "YOUR_TOKEN",
+		applicationId: "YOUR_APPLICATION_ID",
+		guildId: "YOUR_GUILD_ID", // will be ignored if deployGlobally is set to true
+		deployGlobally: true, // defaults to false
+		deployOnChange: true, // re-deploy commands whenever Iubus detects a change in the command data
+	}
 });
 
 client.login("YOUR_TOKEN");
