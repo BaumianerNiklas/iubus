@@ -10,7 +10,7 @@ Dead simple discord.js v14 slash command framework. Iubus (from the latin word _
 
 NOTE: This is not released as a npm package yet. The project is still somewhat under development, though I'm hoping to publish it along with when discord.js v14 becomes a stable release. There are currently no plans of changing the interface etc. of the library anymore, and it should already be ready enough to be released.
 
-The documentation/guide for the frameowork is contained in the [GitHub Wiki](https://github.com/BaumianerNiklas/iubus/wiki) (which is still a heavy WIP), but here's a quickstart example:
+The documentation/guide for the frameowork is contained in the [GitHub Wiki](https://github.com/BaumianerNiklas/iubus/wiki), but here's a quickstart example:
 
 In your entry file:
 
