@@ -1,4 +1,5 @@
 import type { CommandInteraction } from "discord.js";
+import type { BaseCommand } from "./Command.js";
 
 /**
  * Class for creating inhibitors. These can be added to the `inhibitors` field of commands, either by direct reference or name.
@@ -7,7 +8,7 @@ import type { CommandInteraction } from "discord.js";
  */
 export class Inhibitor implements InhibitorData {
 	name: string;
-	run: (interaction: CommandInteraction) => boolean;
+	run: (interaction: CommandInteraction, ctx: InhibitorContext) => boolean;
 
 	constructor(data: InhibitorData) {
 		this.name = data.name;
@@ -17,5 +18,9 @@ export class Inhibitor implements InhibitorData {
 
 export interface InhibitorData {
 	name: string;
-	run: (interaction: CommandInteraction) => boolean;
+	run: (interaction: CommandInteraction, ctx: InhibitorContext) => boolean;
+}
+
+export interface InhibitorContext {
+	command: BaseCommand;
 }

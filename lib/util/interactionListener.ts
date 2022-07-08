@@ -1,5 +1,5 @@
 import { type AnyInteraction, Collection, InteractionType } from "discord.js";
-import { Inhibitor } from "../structures/Inhibitor.js";
+import { Inhibitor, type InhibitorContext } from "../structures/Inhibitor.js";
 import {
 	BaseCommand,
 	ChatInputCommand,
@@ -38,8 +38,11 @@ export async function interactionListener(
 				inhibitor = selectedInhibitor;
 			}
 			if (!inhibitor) continue;
+
+			const context: InhibitorContext = { command };
+
 			// Abort processing the interaction if an inhibitor inhibits the interaction
-			if (inhibitor.run(interaction) == false) return;
+			if (inhibitor.run(interaction, context) == false) return;
 		}
 	}
 
