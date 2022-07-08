@@ -19,8 +19,10 @@ import { IubusClient } from "iubus";
 
 const client = new IubusClient({
 	intents: /* ... */,
-	commandDir: "./dist/commands/",
-	eventDir: "./dist/events",
+	dirs: {
+		commands: "./dist/commands",
+		events: "./dist/events",
+	},
 	deploy: {
 		token: "YOUR_TOKEN",
 		applicationId: "YOUR_APPLICATION_ID",
