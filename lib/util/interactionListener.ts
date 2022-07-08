@@ -1,4 +1,4 @@
-import { type AnyInteraction, Collection, InteractionType } from "discord.js";
+import { Interaction, Collection, InteractionType } from "discord.js";
 import { Inhibitor, type InhibitorContext } from "../structures/Inhibitor.js";
 import {
 	BaseCommand,
@@ -14,7 +14,7 @@ import {
  * @internal
  */
 export async function interactionListener(
-	interaction: AnyInteraction,
+	interaction: Interaction,
 	commands: Collection<string, BaseCommand>,
 	inhibitors: Collection<string, Inhibitor>
 ) {
