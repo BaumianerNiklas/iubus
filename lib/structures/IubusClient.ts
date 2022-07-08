@@ -5,7 +5,8 @@ import { BaseCommand } from "./Command.js";
 import { Event } from "./Event.js";
 import { container } from "./Container.js";
 import { Inhibitor } from "./Inhibitor.js";
-import { deployOnChange, DeployOptions } from "../util/commandDeployment.js";
+import { deployOnChange, type DeployOptions } from "../util/commandDeployment.js";
+import { IubusEvent, type IubusEvents } from "./IubusEvent.js";
 
 /**
  * The entry point to Iubus.
@@ -16,6 +17,7 @@ export class IubusClient extends Client {
 	public readonly deploy?: DeployOptions & { deployOnChange?: boolean };
 	public readonly commands: Collection<string, BaseCommand>;
 	public readonly inhibitors: Collection<string, Inhibitor>;
+	public readonly iubusEvents: Collection<keyof IubusEvents, IubusEvent>;
 	#initialized = false;
 
 	constructor(data: IubusClientOptions) {
@@ -26,6 +28,7 @@ export class IubusClient extends Client {
 
 		this.commands = new Collection();
 		this.inhibitors = new Collection();
+		this.iubusEvents = new Collection();
 	}
 
 	public async login(token?: string) {
@@ -76,6 +79,17 @@ export class IubusClient extends Client {
 			}
 		}
 
+		if (this.dirs?.iubusEvents) {
+			const iubusEvents = await resolveModules(
+				this.dirs.iubusEvents,
+				(mod): mod is IubusEvent => mod instanceof IubusEvent
+			);
+
+			for (const event of iubusEvents) {
+				this.iubusEvents.set(event.name, event);
+			}
+		}
+
 		container.client = this;
 		this.#initialized = true;
 
@@ -91,5 +105,6 @@ export interface IubusClientOptions extends ClientOptions {
 export interface DirectoryOptions {
 	commands?: string;
 	events?: string;
+	iubusEvents?: string;
 	inhibitors?: string;
 }

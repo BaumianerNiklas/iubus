@@ -8,6 +8,7 @@ import {
 	SubcommandMethod,
 	UserContextMenuCommand,
 } from "../structures/Command.js";
+import { emitIubusEvent } from "../structures/IubusEvent.js";
 
 /**
  * The interaction listenser Iubus sets up on the client. This first runs inhibitors and then calls the corresponding method on the commands.
@@ -32,6 +33,7 @@ export async function interactionListener(
 	if (command.inhibitors && interaction.type === InteractionType.ApplicationCommand) {
 		for (const selectedInhibitor of command.inhibitors) {
 			let inhibitor: Inhibitor | undefined;
+
 			if (typeof selectedInhibitor === "string") {
 				inhibitor = inhibitors.get(selectedInhibitor);
 			} else if (selectedInhibitor instanceof Inhibitor) {
@@ -40,9 +42,11 @@ export async function interactionListener(
 			if (!inhibitor) continue;
 
 			const context: InhibitorContext = { command };
+			const result = inhibitor.run(interaction, context);
+			await emitIubusEvent("inhibitorRan", result, interaction, command, inhibitor);
 
 			// Abort processing the interaction if an inhibitor inhibits the interaction
-			if (inhibitor.run(interaction, context) == false) return;
+			if (result === false) return;
 		}
 	}
 

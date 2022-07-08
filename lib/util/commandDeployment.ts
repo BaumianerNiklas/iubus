@@ -11,6 +11,7 @@ import {
 } from "discord.js";
 import type { IubusClient } from "../structures/IubusClient.js";
 import { deepCompare } from "./deepCompare.js";
+import { emitIubusEvent } from "../structures/IubusEvent.js";
 
 /**
  * Deploys raw, processed commands to the Discord API. This is used internally by Iubus both when manually and when automatically deploying commands.
@@ -26,6 +27,8 @@ export async function baseDeployCommands(commands: ApplicationCommandData[], opt
 	rest.put(route, {
 		body: commands,
 	});
+
+	await emitIubusEvent("commandsDeployed", commands, options);
 }
 
 /**
