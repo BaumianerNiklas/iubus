@@ -24,6 +24,6 @@
 	},
 	"dependencies": {
 		"@discordjs/rest": "^0.4.0-dev.1645661242.8203c5d",
-		"discord.js": "^14.0.0-dev.1654949087-96053ba"
+		"discord.js": "^14.0.0-dev.1657239101-e78c9c9"
 	}
 }
