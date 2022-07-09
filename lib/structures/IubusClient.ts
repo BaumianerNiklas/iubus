@@ -6,7 +6,7 @@ import { Event } from "./Event.js";
 import { container } from "./Container.js";
 import { Inhibitor } from "./Inhibitor.js";
 import { deployOnChange, type DeployOptions } from "../util/commandDeployment.js";
-import { IubusEvent, type IubusEvents } from "./IubusEvent.js";
+import { emitIubusEvent, IubusEvent, type IubusEvents } from "./IubusEvent.js";
 
 /**
  * The entry point to Iubus.
@@ -33,6 +33,18 @@ export class IubusClient extends Client {
 
 	public async login(token?: string) {
 		if (this.#initialized) throw new Error("Cannot initialize twice.");
+		container.client = this;
+
+		if (this.dirs?.iubusEvents) {
+			const iubusEvents = await resolveModules(
+				this.dirs.iubusEvents,
+				(mod): mod is IubusEvent => mod instanceof IubusEvent
+			);
+
+			for (const event of iubusEvents) {
+				this.iubusEvents.set(event.name, event);
+			}
+		}
 
 		if (this.dirs?.commands) {
 			const commands = await resolveModules(
@@ -41,6 +53,7 @@ export class IubusClient extends Client {
 			);
 			for (const cmd of commands) {
 				this.commands.set(cmd.name, cmd);
+				await emitIubusEvent("commandRegister", cmd);
 			}
 
 			if (this.deploy?.deployOnChange) {
@@ -65,6 +78,7 @@ export class IubusClient extends Client {
 						event.run(...args);
 					});
 				}
+				await emitIubusEvent("eventRegister", event);
 			}
 		}
 
@@ -76,21 +90,10 @@ export class IubusClient extends Client {
 
 			for (const inhibitor of inhibitors) {
 				this.inhibitors.set(inhibitor.name, inhibitor);
+				await emitIubusEvent("inhibitorRegister", inhibitor);
 			}
 		}
 
-		if (this.dirs?.iubusEvents) {
-			const iubusEvents = await resolveModules(
-				this.dirs.iubusEvents,
-				(mod): mod is IubusEvent => mod instanceof IubusEvent
-			);
-
-			for (const event of iubusEvents) {
-				this.iubusEvents.set(event.name, event);
-			}
-		}
-
-		container.client = this;
 		this.#initialized = true;
 
 		return super.login(token);

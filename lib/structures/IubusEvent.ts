@@ -3,6 +3,7 @@ import type { BaseCommand, ChatInputCommand } from "./Command.js";
 import { container } from "./Container.js";
 import type { Inhibitor } from "./Inhibitor.js";
 import type { DeployOptions } from "../util/commandDeployment.js";
+import { Event } from "./Event.js";
 
 export class IubusEvent<E extends keyof IubusEvents = keyof IubusEvents> implements IubusEventData<E> {
 	public readonly name: E;
@@ -34,5 +35,10 @@ export interface IubusEvents {
 	commandRun: [BaseCommand, CommandInteraction];
 	autocompleteRun: [ChatInputCommand, AutocompleteInteraction];
 	inhibitorRun: [boolean, CommandInteraction, BaseCommand, Inhibitor];
+
+	commandRegister: [BaseCommand];
+	eventRegister: [Event];
+	inhibitorRegister: [Inhibitor];
+
 	commandsDeploy: [ApplicationCommandData[], DeployOptions];
 }
