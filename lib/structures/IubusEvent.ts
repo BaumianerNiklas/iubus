@@ -1,9 +1,9 @@
 import type { ApplicationCommandData, AutocompleteInteraction, CommandInteraction } from "discord.js";
 import type { BaseCommand, ChatInputCommand } from "./Command.js";
 import { container } from "./Container.js";
+import type { Event } from "./Event.js";
 import type { Inhibitor } from "./Inhibitor.js";
 import type { DeployOptions } from "../util/commandDeployment.js";
-import { Event } from "./Event.js";
 
 export class IubusEvent<E extends keyof IubusEvents = keyof IubusEvents> implements IubusEventData<E> {
 	public readonly name: E;
