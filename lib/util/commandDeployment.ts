@@ -28,7 +28,7 @@ export async function baseDeployCommands(commands: ApplicationCommandData[], opt
 		body: commands,
 	});
 
-	await emitIubusEvent("commandsDeployed", commands, options);
+	await emitIubusEvent("commandsDeploy", commands, options);
 }
 
 /**

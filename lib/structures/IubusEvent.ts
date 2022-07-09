@@ -31,6 +31,6 @@ export interface IubusEventData<E extends keyof IubusEvents> {
 }
 
 export interface IubusEvents {
-	inhibitorRan: [boolean, CommandInteraction, BaseCommand, Inhibitor];
-	commandsDeployed: [ApplicationCommandData[], DeployOptions];
+	inhibitorRun: [boolean, CommandInteraction, BaseCommand, Inhibitor];
+	commandsDeploy: [ApplicationCommandData[], DeployOptions];
 }
