@@ -52,8 +52,14 @@ export async function interactionListener(
 
 	// Autocomplete
 	if (interaction.type === InteractionType.ApplicationCommandAutocomplete && command instanceof ChatInputCommand) {
-		if (command.autocomplete) command.autocomplete(interaction);
+		if (command.autocomplete) {
+			await command.autocomplete(interaction);
+			await emitIubusEvent("autocompleteRun", command, interaction);
+		}
 	}
+
+	if (interaction.type === InteractionType.ApplicationCommandAutocomplete) return;
+	const emitCommandRunEvent = async () => await emitIubusEvent("commandRun", command, interaction);
 
 	// Regular slash commands
 	if (interaction.isChatInputCommand() && command instanceof ChatInputCommand) {
@@ -71,12 +77,21 @@ export async function interactionListener(
 			}
 		}
 
-		if (command.run) await command.run(interaction);
+		if (command.run) {
+			await command.run(interaction);
+			await emitCommandRunEvent();
+		}
 
 		// Context menu commands
 	} else if (interaction.isUserContextMenuCommand() && command instanceof UserContextMenuCommand) {
-		if (command.run) await command.run(interaction);
+		if (command.run) {
+			await command.run(interaction);
+			await emitCommandRunEvent();
+		}
 	} else if (interaction.isMessageContextMenuCommand() && command instanceof MessageContextMenuCommand) {
-		if (command.run) await command.run(interaction);
+		if (command.run) {
+			await command.run(interaction);
+			await emitCommandRunEvent();
+		}
 	}
 }

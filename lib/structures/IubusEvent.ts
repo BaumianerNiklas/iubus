@@ -1,5 +1,5 @@
-import type { ApplicationCommandData, CommandInteraction } from "discord.js";
-import type { BaseCommand } from "./Command.js";
+import type { ApplicationCommandData, AutocompleteInteraction, CommandInteraction } from "discord.js";
+import type { BaseCommand, ChatInputCommand } from "./Command.js";
 import { container } from "./Container.js";
 import type { Inhibitor } from "./Inhibitor.js";
 import type { DeployOptions } from "../util/commandDeployment.js";
@@ -31,6 +31,8 @@ export interface IubusEventData<E extends keyof IubusEvents> {
 }
 
 export interface IubusEvents {
+	commandRun: [BaseCommand, CommandInteraction];
+	autocompleteRun: [ChatInputCommand, AutocompleteInteraction];
 	inhibitorRun: [boolean, CommandInteraction, BaseCommand, Inhibitor];
 	commandsDeploy: [ApplicationCommandData[], DeployOptions];
 }
