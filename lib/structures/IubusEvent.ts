@@ -5,6 +5,9 @@ import type { Event } from "./Event.js";
 import type { Inhibitor } from "./Inhibitor.js";
 import type { DeployOptions } from "../util/commandDeployment.js";
 
+/**
+ * Class for creating event listeners.
+ */
 export class IubusEvent<E extends keyof IubusEvents = keyof IubusEvents> implements IubusEventData<E> {
 	public readonly name: E;
 	public readonly run: (...args: IubusEvents[E]) => unknown;
@@ -31,6 +34,9 @@ export interface IubusEventData<E extends keyof IubusEvents> {
 	run: (...args: IubusEvents[E]) => unknown;
 }
 
+/**
+ * Interface containing all iubus event keys and their corresponding list of payload parameters. Identical in structure to discord.js' `ClientEvents`.
+ */
 export interface IubusEvents {
 	commandRun: [BaseCommand, CommandInteraction];
 	autocompleteRun: [ChatInputCommand, AutocompleteInteraction];
