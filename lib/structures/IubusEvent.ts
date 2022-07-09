@@ -34,7 +34,7 @@ export interface IubusEventData<E extends keyof IubusEvents> {
 export interface IubusEvents {
 	commandRun: [BaseCommand, CommandInteraction];
 	autocompleteRun: [ChatInputCommand, AutocompleteInteraction];
-	inhibitorRun: [boolean, CommandInteraction, BaseCommand, Inhibitor];
+	inhibitorRun: [boolean, Inhibitor, CommandInteraction, BaseCommand];
 
 	commandRegister: [BaseCommand];
 	eventRegister: [Event];

@@ -43,7 +43,7 @@ export async function interactionListener(
 
 			const context: InhibitorContext = { command };
 			const result = inhibitor.run(interaction, context);
-			await emitIubusEvent("inhibitorRun", result, interaction, command, inhibitor);
+			await emitIubusEvent("inhibitorRun", result, inhibitor, interaction, command);
 
 			// Abort processing the interaction if an inhibitor inhibits the interaction
 			if (result === false) return;
