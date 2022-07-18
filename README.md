@@ -6,9 +6,9 @@
 
 </div>
 
-Dead simple discord.js v14 slash command framework. Iubus (from the latin word _iubere_ - "to command, to order") is a simple, barebones framework on top of discord.js for easily dealing with slash commands.
+Iubus (from the latin word _iubere_ - "to command, to order") is a simple, barebones framework on top of discord.js for easily dealing with slash commands.
 
-The documentation/guide for the frameowork is contained in the [GitHub Wiki](https://github.com/BaumianerNiklas/iubus/wiki), but here's a quickstart example:
+The documentation/guide for the framework is contained in the [GitHub Wiki](https://github.com/BaumianerNiklas/iubus/wiki), but here's a quickstart example:
 
 In your entry file:
 
