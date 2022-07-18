@@ -57,4 +57,4 @@ export default new ChatInputCommand({
 
 ---
 
-This library is mostly a passion project I created for myself, but at the same time I do hope others will find the use in this once it is released as a npm package. This is also my first time making a npm package, so any constructive feedback, criticism, or contribution in form of a issue or pull request would be greatly appreciated :)
+This library is mostly a passion project I created for myself, but at the same time I do hope others will find use in this. This is the first npm package I've published, so any constructive feedback, criticism, or contribution in form of a issue or pull request would be greatly appreciated :)
