@@ -1,0 +1,10 @@
+# Source directory does not have to be included in the package, as it gets compiled to JS and .d.ts files under /dist/, which is the actual package
+src
+
+# Irrelevant config files
+.eslintrc.json
+.prettierrc.json
+tsconfig.json
+
+# Only contains assets for GitHub
+assets
