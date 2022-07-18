@@ -2,12 +2,12 @@
 	"name": "iubus",
 	"version": "0.1.0",
 	"description": "Dead simple discord.js slash command framework",
+	"type": "module",
 	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"scripts": {
 		"lint": "npx eslint lib/**/*.ts"
 	},
-	"types": "dist/index.d.ts",
-	"type": "module",
 	"author": {
 		"name": "BaumianerNiklas",
 		"url": "https://github.com/BaumianerNiklas"
