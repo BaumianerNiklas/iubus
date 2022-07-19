@@ -1,6 +1,6 @@
 {
 	"name": "iubus",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Dead simple discord.js slash command framework",
 	"type": "module",
 	"main": "dist/index.js",
