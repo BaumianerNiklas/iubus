@@ -33,7 +33,7 @@ const client = new IubusClient({
 client.login("YOUR_TOKEN");
 ```
 
-Then, in a command file (inside `commandDir`):
+Then, inside a command file (somewhere in `dirs.commands`):
 
 ```ts
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
