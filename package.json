@@ -22,7 +22,9 @@
 		"discord",
 		"commands",
 		"slash-commands",
-		"framework"
+		"framework",
+		"typescript",
+		"esm"
 	],
 	"license": "MIT",
 	"devDependencies": {
